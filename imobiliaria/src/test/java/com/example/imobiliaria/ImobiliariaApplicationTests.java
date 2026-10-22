@@ -12,13 +12,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@Transactional // Garante rollback automático ao final de cada teste, mantendo o banco limpo e testes isolados
 class ImobiliariaApplicationTests {
 
     @Autowired
@@ -109,5 +112,23 @@ class ImobiliariaApplicationTests {
         // Tarefa 9: Imóvel 1 possui locação ativa em novembro de 2026
         NegocioException ex = assertThrows(NegocioException.class, () -> imoveisService.deletar(1));
         assertTrue(ex.getMessage().contains("Não é permitido excluir imóvel"));
+    }
+
+    @Test
+    void devePesquisarImoveisComQueryByExample() {
+        // Tarefa 10: Busca case-insensitive e correspondência parcial
+        // 1. Pesquisa por cidade "imperatriz" em minúsculas
+        List<Imoveis> imoveisImperatriz = imoveisService.pesquisarPorExample(null, "imperatriz", null);
+        assertFalse(imoveisImperatriz.isEmpty(), "Deve encontrar imóveis em Imperatriz");
+        assertEquals(2, imoveisImperatriz.size(), "Devem existir 2 imóveis em Imperatriz");
+
+        // 2. Pesquisa por tipo "apartamento" e quantidade de quartos = 2
+        List<Imoveis> apartamentos2Quartos = imoveisService.pesquisarPorExample("apartamento", null, 2);
+        assertFalse(apartamentos2Quartos.isEmpty(), "Deve encontrar apartamentos de 2 quartos");
+        assertEquals(2, apartamentos2Quartos.size());
+
+        // 3. Pesquisa por tipo "casa" em "São Luís" com 4 quartos
+        List<Imoveis> casasGrandesSLZ = imoveisService.pesquisarPorExample("casa", "são luís", 4);
+        assertEquals(1, casasGrandesSLZ.size());
     }
 }

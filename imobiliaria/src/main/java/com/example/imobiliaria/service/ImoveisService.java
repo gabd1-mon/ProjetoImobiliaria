@@ -5,6 +5,8 @@ import com.example.imobiliaria.exception.NegocioException;
 import com.example.imobiliaria.model.Imoveis;
 import com.example.imobiliaria.repository.ImoveisRepository;
 import com.example.imobiliaria.repository.LocacaoRepository;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -32,9 +34,26 @@ public class ImoveisService {
         return imoveisRepository.findAll();
     }
 
-    // Busca paginada usando facilidades do Spring Data JPA
+    // Busca paginada usando facilidades do Spring Data JPA (Tarefa 6)
     public Page<Imoveis> buscaPaginada(Pageable pageable) {
         return imoveisRepository.findAll(pageable);
+    }
+
+    // Tarefa 10: Consultas dinâmicas com Query by Example (QBE)
+    public List<Imoveis> pesquisarPorExample(String tipo, String cidade, Integer dormitorios) {
+        Imoveis probe = new Imoveis();
+        probe.setTipoImovel(tipo);
+        probe.setEndereco(cidade);
+        probe.setDormitorios(dormitorios);
+
+        // Configuração do Matcher: ignora nulos, case-insensitive e correspondência parcial (LIKE %termo%)
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                .withIgnoreNullValues()
+                .withIgnoreCase()
+                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+
+        Example<Imoveis> example = Example.of(probe, matcher);
+        return imoveisRepository.findAll(example);
     }
 
     public Imoveis buscarPorId(Integer id) {

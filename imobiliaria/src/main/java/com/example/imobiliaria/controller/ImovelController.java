@@ -34,6 +34,17 @@ public class ImovelController {
         return ResponseEntity.ok(imoveisService.listarImoveis());
     }
 
+    // Tarefa 10: Consulta com Query by Example a partir de campos opcionais
+    // Exemplo: GET /imoveis/byexample?tipo=apartamento&cidade=são luís&quartos=2
+    @GetMapping("/byexample")
+    public ResponseEntity<List<Imoveis>> pesquisarPorExample(
+            @RequestParam(required = false) String tipo,
+            @RequestParam(required = false) String cidade,
+            @RequestParam(required = false) Integer quartos) {
+        List<Imoveis> resultado = imoveisService.pesquisarPorExample(tipo, cidade, quartos);
+        return ResponseEntity.ok(resultado);
+    }
+
     // Busca paginada no formato das aulas do IFMA: /imoveis/paginacao/{numPagina}/{qtdPagina}
     @GetMapping("/paginacao/{numPagina}/{qtdPagina}")
     public ResponseEntity<Page<Imoveis>> buscaPaginadaPorPath(
