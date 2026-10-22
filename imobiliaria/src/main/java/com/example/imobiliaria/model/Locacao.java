@@ -27,9 +27,9 @@ public class Locacao {
     @JoinColumn(name = "id_inquilino")
     private Cliente cliente;
 
-    @NotNull(message = "O status da locação (ativo) é obrigatório")
+    // O status é gerenciado pelo sistema (inicia ativo = true por padrão)
     @Column(nullable = false)
-    private Boolean ativo;
+    private Boolean ativo = true;
 
     @NotNull(message = "A data de fim é obrigatória")
     @Column(nullable = false)
@@ -50,13 +50,15 @@ public class Locacao {
     @Column(nullable = false)
     private BigDecimal percMulta;
 
-    @NotNull(message = "O valor do aluguel é obrigatório")
-    @PositiveOrZero(message = "O valor do aluguel não pode ser negativo")
+    // Tarefa 8: O valor do aluguel é calculado automaticamente pelo sistema com base na diária e no período
     @Column(nullable = false)
     private BigDecimal valorAluguel;
 
     @Column(columnDefinition = "TEXT")
     private String obs;
+
+    public Locacao() {
+    }
 
     // Getters e Setters
 

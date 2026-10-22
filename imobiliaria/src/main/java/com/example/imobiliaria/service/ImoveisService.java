@@ -1,21 +1,27 @@
 package com.example.imobiliaria.service;
 
 import com.example.imobiliaria.exception.EntidadeNaoEncontradaException;
+import com.example.imobiliaria.exception.NegocioException;
 import com.example.imobiliaria.model.Imoveis;
 import com.example.imobiliaria.repository.ImoveisRepository;
+import com.example.imobiliaria.repository.LocacaoRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
 public class ImoveisService {
 
     private final ImoveisRepository imoveisRepository;
+    private final LocacaoRepository locacaoRepository;
 
-    public ImoveisService(ImoveisRepository imoveisRepository) {
+    public ImoveisService(ImoveisRepository imoveisRepository, LocacaoRepository locacaoRepository) {
         this.imoveisRepository = imoveisRepository;
+        this.locacaoRepository = locacaoRepository;
     }
 
     public Imoveis salvar(Imoveis imoveis) {
@@ -52,8 +58,16 @@ public class ImoveisService {
         return imoveisRepository.save(imovelExistente);
     }
 
+    @Transactional
     public void deletar(Integer id) {
         buscarPorId(id); // Garante 404 se não existir
+
+        // Tarefa 9: Impedir a exclusão de imóvel que possua locações ativas ou futuras
+        boolean possuiLocacoes = locacaoRepository.possuiLocacoesAtivasOuFuturas(id, LocalDate.now());
+        if (possuiLocacoes) {
+            throw new NegocioException("Não é permitido excluir imóvel que possua locações ativas ou futuras.");
+        }
+
         imoveisRepository.deleteById(id);
     }
 }
