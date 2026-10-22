@@ -3,6 +3,8 @@ package com.example.imobiliaria.service;
 import com.example.imobiliaria.exception.EntidadeNaoEncontradaException;
 import com.example.imobiliaria.model.Imoveis;
 import com.example.imobiliaria.repository.ImoveisRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +24,11 @@ public class ImoveisService {
 
     public List<Imoveis> listarImoveis() {
         return imoveisRepository.findAll();
+    }
+
+    // Busca paginada usando facilidades do Spring Data JPA
+    public Page<Imoveis> buscaPaginada(Pageable pageable) {
+        return imoveisRepository.findAll(pageable);
     }
 
     public Imoveis buscarPorId(Integer id) {
