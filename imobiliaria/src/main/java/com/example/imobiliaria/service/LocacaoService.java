@@ -1,8 +1,9 @@
 package com.example.imobiliaria.service;
 
-import org.springframework.stereotype.Service;
+import com.example.imobiliaria.exception.EntidadeNaoEncontradaException;
 import com.example.imobiliaria.model.Locacao;
 import com.example.imobiliaria.repository.LocacaoRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -15,23 +16,22 @@ public class LocacaoService {
         this.locacaoRepository = locacaoRepository;
     }
 
-    public Locacao salvar(Locacao locacao){
+    public Locacao salvar(Locacao locacao) {
         return locacaoRepository.save(locacao);
     }
 
-    public List<Locacao> listarLocacao(){
+    public List<Locacao> listarLocacao() {
         return locacaoRepository.findAll();
     }
 
     public Locacao buscarPorId(Integer id) {
         return locacaoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Locação não encontrada com o ID: " + id));
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Locação não encontrada com o ID: " + id));
     }
 
     public Locacao atualizar(Integer id, Locacao locacaoAtualizada) {
         Locacao locacaoExistente = buscarPorId(id);
 
-        // Atualiza os dados da locação com os novos valores
         locacaoExistente.setImoveis(locacaoAtualizada.getImoveis());
         locacaoExistente.setCliente(locacaoAtualizada.getCliente());
         locacaoExistente.setAtivo(locacaoAtualizada.getAtivo());
@@ -46,6 +46,7 @@ public class LocacaoService {
     }
 
     public void deletar(Integer id) {
+        buscarPorId(id); // Garante 404 se não existir
         locacaoRepository.deleteById(id);
     }
 }

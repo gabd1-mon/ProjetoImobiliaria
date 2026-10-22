@@ -1,4 +1,6 @@
 package com.example.imobiliaria.service;
+
+import com.example.imobiliaria.exception.EntidadeNaoEncontradaException;
 import com.example.imobiliaria.model.Cliente;
 import com.example.imobiliaria.repository.ClienteRepository;
 import org.springframework.stereotype.Service;
@@ -8,9 +10,9 @@ import java.util.List;
 @Service
 public class ClienteService {
 
-    private final ClienteRepository clienteRepository ;
+    private final ClienteRepository clienteRepository;
 
-    public ClienteService (ClienteRepository clienteRepository) {
+    public ClienteService(ClienteRepository clienteRepository) {
         this.clienteRepository = clienteRepository;
     }
 
@@ -22,9 +24,9 @@ public class ClienteService {
         return clienteRepository.findAll();
     }
 
-
-    public  Cliente buscarPorId(Integer id) {
-        return clienteRepository.findById(id).orElseThrow(()->new RuntimeException("Cliente nao encontrado"));
+    public Cliente buscarPorId(Integer id) {
+        return clienteRepository.findById(id)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Cliente não encontrado com o ID: " + id));
     }
 
     public Cliente atualizarCliente(Integer id, Cliente clienteAtualizado) {
@@ -38,8 +40,9 @@ public class ClienteService {
 
         return clienteRepository.save(clienteExistente);
     }
+
     public void deletarCliente(Integer id) {
+        buscarPorId(id); // Se o cliente não existir, lança 404
         clienteRepository.deleteById(id);
     }
-
 }

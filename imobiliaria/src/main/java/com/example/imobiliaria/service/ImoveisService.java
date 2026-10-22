@@ -1,8 +1,9 @@
 package com.example.imobiliaria.service;
 
-import org.springframework.stereotype.Service;
+import com.example.imobiliaria.exception.EntidadeNaoEncontradaException;
 import com.example.imobiliaria.model.Imoveis;
 import com.example.imobiliaria.repository.ImoveisRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -11,27 +12,26 @@ public class ImoveisService {
 
     private final ImoveisRepository imoveisRepository;
 
-
     public ImoveisService(ImoveisRepository imoveisRepository) {
         this.imoveisRepository = imoveisRepository;
     }
 
-    public Imoveis salvar(Imoveis imoveis){
+    public Imoveis salvar(Imoveis imoveis) {
         return imoveisRepository.save(imoveis);
     }
 
     public List<Imoveis> listarImoveis() {
         return imoveisRepository.findAll();
     }
+
     public Imoveis buscarPorId(Integer id) {
         return imoveisRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Imóvel não encontrado com o ID: " + id));
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Imóvel não encontrado com o ID: " + id));
     }
 
     public Imoveis atualizar(Integer id, Imoveis imovelAtualizado) {
         Imoveis imovelExistente = buscarPorId(id);
 
-        // Atualiza os campos baseados no teu banco de dados
         imovelExistente.setTipoImovel(imovelAtualizado.getTipoImovel());
         imovelExistente.setEndereco(imovelAtualizado.getEndereco());
         imovelExistente.setCep(imovelAtualizado.getCep());
@@ -46,6 +46,7 @@ public class ImoveisService {
     }
 
     public void deletar(Integer id) {
+        buscarPorId(id); // Garante 404 se não existir
         imoveisRepository.deleteById(id);
     }
 }
